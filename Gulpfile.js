@@ -7,7 +7,7 @@ gulp.task('download', (done) => {
   wrap.downloadServer('1.12', 'server.jar', done)
 })
 
-gulp.task('run', ['download'], (done) => {
+gulp.task('server', (done) => {
   const jarPath = path.join(__dirname, 'server.jar')
   const options = { 'online-mode': 'false' }
   const server = new wrap.WrapServer(jarPath, './server', {maxMem: '2048', minMem: '2048'})
@@ -30,3 +30,5 @@ gulp.task('run', ['download'], (done) => {
     server.writeServer(line)
   })
 })
+
+gulp.task('run', ['download', 'server'])

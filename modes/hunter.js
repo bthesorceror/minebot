@@ -37,7 +37,7 @@ class Hunter {
   constructor (bot) {
     this.bot = bot
     this.hunting = null
-    this.state = 'waiting'
+    this.timeout = null
     this.history = new CappedList(1000)
 
     autobind(this)
@@ -46,9 +46,14 @@ class Hunter {
   }
 
   clearHunting () {
+    if (this.timeout) {
+      return
+    }
+
     this.hunting = null
-    setTimeout(() => {
+    this.timeout = setTimeout(() => {
       this.findTarget()
+      this.timeout = null
     }, CLEAR_HUNTING_TIMEOUT)
   }
 
@@ -71,7 +76,7 @@ class Hunter {
 
     log.info('Entity', this.hunting, _.get(entity, 'id'))
     this.bot.attack(entity)
-    this.bot.navigate.to(entity.position, { endRadius: END_RADIUS })
+    this.navigateTo(entity)
   }
 
   handleCannotFind () {
@@ -92,7 +97,7 @@ class Hunter {
     this.history.push(target)
 
     this.hunting = target.id
-    this.bot.navigate.to(target.position, { endRadius: END_RADIUS })
+    this.navigateTo(target)
   }
 
   handleEntityGone (entity) {
@@ -107,7 +112,12 @@ class Hunter {
   }
 
   handleDeath () {
+    this.clearTimeout()
     this.hunting = null
+  }
+
+  navigateTo (entity) {
+    this.bot.navigate.to(entity.position, { endRadius: END_RADIUS })
   }
 
   attachEvents () {
@@ -128,7 +138,14 @@ class Hunter {
     this.bot.navigate.removeListener('cannotFind', this.handleCannotFind)
   }
 
+  clearTimeout () {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
+  }
+
   destroy () {
+    this.clearTimeout()
     this.removeEvents()
   }
 }
