@@ -1,7 +1,34 @@
 const modes = (bot, settings, initial = 'default') => {
-  let currentMode = new settings[initial](bot)
+  let currentMode = null
 
-  bot.on('chat', (username, message) => {
+  const nextMode = () => {
+    return initial
+  }
+
+  const changeMode = (mode) => {
+    const Mode = settings[mode]
+
+    if (!Mode) {
+      bot.chat(`I don't know ${mode}`)
+      return
+    }
+
+    if (currentMode) {
+      currentMode.destroy()
+      currentMode.removeAllListeners('mode:change')
+    }
+
+    bot.chat(`I am switching to ${mode} mode`)
+    currentMode = new Mode(bot)
+
+    currentMode.once('mode:change', () => {
+      changeMode(nextMode())
+    })
+  }
+
+  changeMode(initial)
+
+  bot.on('chat', (_username, message) => {
     const matcher = /^become ([a-zA-Z]+)$/
     const matches = message.match(matcher)
 
@@ -9,16 +36,7 @@ const modes = (bot, settings, initial = 'default') => {
       return
     }
 
-    const Mode = settings[matches[1]]
-
-    if (!Mode) {
-      bot.chat(`I don't know ${matches[1]}`)
-      return
-    }
-
-    currentMode.destroy()
-    bot.chat(`I am switching to ${matches[1]} mode`)
-    currentMode = new Mode(bot)
+    changeMode(matches[1])
   })
 
   bot.on('error', (err) => {

@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const autobind = require('auto-bind')
+const {EventEmitter} = require('events')
 
 const log = {
   info (...args) {
@@ -33,12 +34,15 @@ class CappedList {
   }
 }
 
-class Hunter {
+class Hunter extends EventEmitter {
   constructor (bot) {
+    super()
+
     this.bot = bot
     this.hunting = null
     this.timeout = null
     this.history = new CappedList(1000)
+    this.killCount = 0
 
     autobind(this)
     this.attachEvents()
@@ -102,6 +106,12 @@ class Hunter {
 
   handleEntityGone (entity) {
     if (this.hunting && this.hunting === entity.id) {
+      this.killCount += 1
+
+      if (this.killCount > 6) {
+        return this.emit('mode:change')
+      }
+
       log.info('Entity is gone')
       this.clearHunting()
     }

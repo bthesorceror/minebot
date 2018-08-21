@@ -1,7 +1,10 @@
+const { EventEmitter } = require('events')
 const autobind = require('auto-bind')
 
-class Default {
+class Default extends EventEmitter {
   constructor (bot) {
+    super()
+
     this.bot = bot
     autobind(this)
     this.addListeners()
