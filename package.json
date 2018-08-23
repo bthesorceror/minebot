@@ -26,7 +26,7 @@
     "level": "^4.0.0",
     "lodash": "^4.17.10",
     "minecraft-wrap": "^1.1.8",
-    "mineflayer": "^2.7.3",
+    "mineflayer": "git+https://git@github.com/PrismarineJS/mineflayer.git",
     "mineflayer-navigate": "0.0.10"
   }
 }

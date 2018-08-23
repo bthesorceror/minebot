@@ -12,6 +12,7 @@ const database = require('./plugins/database')
 const Default = require('./modes/default')
 const Hunter = require('./modes/hunter')
 const Logger = require('./modes/logger')
+const Miner = require('./modes/miner')
 
 const username = 'BRBot'
 const bot = mineflayer.createBot({ username })
@@ -26,7 +27,8 @@ bot.once('spawn', () => {
   modes(bot, {
     default: Default,
     hunter: Hunter,
-    logger: Logger
+    logger: Logger,
+    miner: Miner
   })
 })
 
