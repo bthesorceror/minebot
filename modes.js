@@ -1,34 +1,57 @@
-const modes = (bot, settings, initial = 'default') => {
-  let currentMode = null
+const autobind = require('auto-bind')
 
-  const nextMode = () => {
-    return initial
+class ModeSelector {
+  constructor (bot, settings, initial = 'default') {
+    this.bot = bot
+    this.currentMode = null
+    this.settings = settings
+    this.initial = initial
+
+    bot.stocker.on('inventoryChanged', () => {
+      console.log('INVENTORY CHANGED')
+    })
+
+    autobind(this)
+
+    this.bot.on('error', this.handleError)
+    this.bot.on('end', this.handleEnd)
+    this.bot.on('chat', this.handleChat)
+
+    this.changeMode(initial)
   }
 
-  const changeMode = (mode) => {
-    const Mode = settings[mode]
+  changeMode (key, options = {}) {
+    const Mode = this.getModeClass(key)
 
     if (!Mode) {
-      bot.chat(`I don't know ${mode}`)
-      return
+      return this.bot.chat(`I don't know ${key}`)
     }
 
-    if (currentMode) {
-      currentMode.destroy()
-      currentMode.removeAllListeners('mode:change')
+    if (this.currentMode) {
+      this.currentMode.destroy()
+      this.currentMode.removeListener('mode:change', this.handleModeChange)
     }
 
-    bot.chat(`I am switching to ${mode} mode`)
-    currentMode = new Mode(bot)
+    this.bot.chat(`I am switching to ${key} mode`)
+    this.currentMode = new Mode(this.bot, options)
 
-    currentMode.once('mode:change', () => {
-      changeMode(nextMode())
-    })
+    this.currentMode.once('mode:change', this.handleModeChange)
   }
 
-  changeMode(initial)
+  getNextMode () {
+    return { key: this.initial, options: {} }
+  }
 
-  bot.on('chat', (_username, message) => {
+  getModeClass (key) {
+    return this.settings[key]
+  }
+
+  handleModeChange () {
+    const next = this.getNextMode()
+    this.changeMode(next.key, next.options)
+  }
+
+  handleChat (_username, message) {
     const matcher = /^become ([a-zA-Z]+)$/
     const matches = message.match(matcher)
 
@@ -36,18 +59,22 @@ const modes = (bot, settings, initial = 'default') => {
       return
     }
 
-    changeMode(matches[1])
-  })
+    this.changeMode(matches[1])
+  }
 
-  bot.on('error', (err) => {
-    console.error(err)
+  handleError (error) {
+    console.error(error)
     process.exit(1)
-  })
+  }
 
-  bot.on('end', () => {
-    console.info('Connection ended.')
-    process.exit(1)
-  })
+  handleEnd () {
+    console.info('Connection closed.')
+    process.exit(0)
+  }
+}
+
+const modes = (bot, settings, initial = 'default') => {
+  return new ModeSelector(bot, settings, initial)
 }
 
 module.exports = modes

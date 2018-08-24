@@ -33,7 +33,7 @@ class Logger extends EventEmitter {
       point: this.bot.entity.position,
       matching: (block) => (
         block.material === 'wood' ||
-        block.material === 'leaves'
+        block.type === 18
       ),
       maxDistance: this.distance
     })

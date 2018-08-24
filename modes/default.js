@@ -7,11 +7,12 @@ class Default extends EventEmitter {
 
     this.bot = bot
     autobind(this)
+
     this.addListeners()
   }
 
   handlePlayerJoin (player) {
-    this.bot.sayYO(player.username)
+    this.bot.yo.chat(player.username)
   }
 
   handleChat (username, message) {

@@ -1,9 +1,18 @@
-const yo = (bot) => {
-  const sayYO = (username) => {
-    bot.chat(`YO! ${username}`)
+const autobind = require('auto-bind')
+
+class YO {
+  constructor (bot) {
+    this.bot = bot
+
+    autobind(this)
   }
 
-  bot.sayYO = sayYO
+  chat (message) {
+    this.bot.chat(`YO! ${message}`)
+  }
+}
+const yo = (bot) => {
+  bot.yo = new YO(bot)
 }
 
 module.exports = yo

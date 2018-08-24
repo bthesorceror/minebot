@@ -7,6 +7,10 @@ const watch = require('./plugins/watch')
 const navigate = require('mineflayer-navigate')(mineflayer)
 const yo = require('./plugins/yo')
 const database = require('./plugins/database')
+const looker = require('./plugins/looker')
+const placer = require('./plugins/placer')
+const crafting = require('./plugins/crafting')
+const stocker = require('./plugins/stocker')
 
 // Modes
 const Default = require('./modes/default')
@@ -22,6 +26,10 @@ bot.loadPlugin(watch)
 bot.loadPlugin(navigate)
 bot.loadPlugin(finder)
 bot.loadPlugin(database)
+bot.loadPlugin(looker)
+bot.loadPlugin(placer)
+bot.loadPlugin(crafting)
+bot.loadPlugin(stocker)
 
 bot.once('spawn', () => {
   modes(bot, {

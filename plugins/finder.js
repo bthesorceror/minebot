@@ -1,13 +1,30 @@
 const _ = require('lodash')
+const { EventEmitter } = require('events')
 
-const finder = (bot) => {
-  const obj = {
-    findUserByUsername (username) {
-      return _.find(bot.entities, (entity) => entity.username && entity.username === username)
-    }
+class Finder extends EventEmitter {
+  constructor (bot) {
+    super()
+
+    this.bot = bot
   }
 
-  bot.finder = obj
+  findUserByUsername (username) {
+    return _.find(this.bot.entities, (entity) => (
+      entity.username && entity.username === username
+    ))
+  }
+
+  findNearbyDirtBlock () {
+    return this.bot.findBlock({
+      point: this.bot.entity.position,
+      matching: (b) => b.type in [2, 3],
+      maxDistance: 1
+    })
+  }
+}
+
+const finder = (bot) => {
+  bot.finder = new Finder(bot)
 }
 
 module.exports = finder
