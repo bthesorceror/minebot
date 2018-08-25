@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const autobind = require('auto-bind')
 const { EventEmitter } = require('events')
 
 class Crafting extends EventEmitter {
@@ -6,6 +7,7 @@ class Crafting extends EventEmitter {
     super()
 
     this.bot = bot
+    autobind(this)
   }
 
   async craft (itemType, count) {
@@ -15,15 +17,16 @@ class Crafting extends EventEmitter {
       throw new Error('No recipes available.')
     }
 
-    await new Promise(resolve => {
-      console.info('crafting planks')
+    await this.bot.looker.lookAt(this.bot.entity.position.offset(0, 3, 0))
+
+    return new Promise(resolve => {
       this.bot.craft(recipe, count, null, resolve)
     })
   }
 }
 
 const crafting = (bot) => {
-  bot.crafting = new Crafting()
+  bot.crafting = new Crafting(bot)
 }
 
 module.exports = crafting

@@ -26,7 +26,7 @@ class Stocker extends EventEmitter {
 
     if (oldCount !== newCount) {
       this.items = currentItems
-      this.emit('inventoryChanged')
+      this.emit('inventoryChanged', newCount - oldCount)
     }
   }
 

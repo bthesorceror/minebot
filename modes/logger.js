@@ -32,8 +32,7 @@ class Logger extends EventEmitter {
     const block = this.bot.findBlock({
       point: this.bot.entity.position,
       matching: (block) => (
-        block.material === 'wood' ||
-        block.type === 18
+        block.material === 'wood'
       ),
       maxDistance: this.distance
     })
@@ -66,6 +65,7 @@ class Logger extends EventEmitter {
 
   destroy () {
     this.running = false
+    this.bot.stopDigging()
     if (this.timeout) {
       clearTimeout(this.timeout)
     }

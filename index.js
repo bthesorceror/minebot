@@ -17,6 +17,7 @@ const Default = require('./modes/default')
 const Hunter = require('./modes/hunter')
 const Logger = require('./modes/logger')
 const Miner = require('./modes/miner')
+const Crafter = require('./modes/crafter')
 
 const username = 'BRBot'
 const bot = mineflayer.createBot({ username })
@@ -36,7 +37,8 @@ bot.once('spawn', () => {
     default: Default,
     hunter: Hunter,
     logger: Logger,
-    miner: Miner
+    miner: Miner,
+    crafter: Crafter
   })
 })
 
